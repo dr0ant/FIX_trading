@@ -1,4 +1,24 @@
+-- Step 1: Set MinIO connection parameters
+SET s3_region='us-east-1'; -- Placeholder region for MinIO
+SET s3_url_style='path'; -- Use path-style access for MinIO
+SET s3_endpoint='localhost:9000'; -- Ensure the endpoint includes 'http://'
+SET s3_access_key_id='minioadmin'; -- MinIO root user
+SET s3_secret_access_key='minioadmin'; -- MinIO root password
+SET s3_use_ssl='false'; -- Set to 'true' if using HTTPS
+
+-- Step 2: Load necessary extensions from DuckDB's online repository
+LOAD httpfs; -- Load the HTTPFS extension
+LOAD parquet; -- Load the Parquet extension
+
+-- Step 3: Query the Parquet file in the MinIO bucket
+SELECT *
+FROM read_parquet('s3://parquetfixlogs/fix_logs.parquet')
+LIMIT 100;
+
+
+
 SELECT
+  filename,
   timestamp,
   system,
   fix_tags ->> '35' AS msg_type,
@@ -23,7 +43,8 @@ SELECT
   fix_tags ->> '34'  AS msg_seq_num,
   fix_tags ->> '52'  AS sending_time,
   fix_tags ->> '526' AS secondary_cl_ord_id
-FROM read_parquet('s3://parquetfixlogs/fix_logs.parquet')
+FROM read_parquet('s3://parquetfixlogs/*.parquet')
 WHERE fix_tags IS NOT NULL
 ORDER BY timestamp
 LIMIT 100;
+
