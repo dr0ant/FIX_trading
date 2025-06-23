@@ -54,6 +54,84 @@ graph TD
     B -->|Already Processed| E[Skip]
 ```
 
+
+## Data model first draft
+```mermaid
+erDiagram
+    EVENTS {
+        bigint event_id PK
+        timestamp event_timestamp
+        varchar(20) system
+        varchar(20) sender_comp_id
+        varchar(20) target_comp_id
+        char(1) msg_type
+        varchar(50) cl_ord_id
+        varchar(50) order_id
+        varchar(50) exec_id
+        char(1) exec_type
+        char(1) ord_status
+        varchar(10) account
+        varchar(10) symbol
+        char(1) side
+        char(3) currency
+        decimal price
+        decimal quantity
+        timestamp transact_time
+        varchar(20) time_in_force
+        varchar(50) secondary_cl_ord_id
+        varchar(10) begin_string
+        int msg_seq_num
+    }
+    
+    ORDERS {
+        varchar(50) cl_ord_id PK
+        varchar(50) order_id
+        varchar(10) account
+        varchar(10) symbol
+        char(1) side
+        decimal original_price
+        decimal original_quantity
+        timestamp created_at
+        timestamp last_updated
+        char(1) current_status
+    }
+    
+    ORDER_EVENTS {
+        bigint event_id PK
+        varchar(50) cl_ord_id FK
+        varchar(20) event_type
+        timestamp event_time
+    }
+    
+    EXECUTIONS {
+        varchar(50) exec_id PK
+        varchar(50) cl_ord_id FK
+        decimal exec_quantity
+        decimal exec_price
+        char(1) exec_type
+        timestamp exec_time
+    }
+    
+    SYSTEMS {
+        varchar(20) system_id PK
+        varchar(100) system_name
+    }
+    
+    SYMBOLS {
+        varchar(10) symbol_id PK
+        varchar(100) asset_class
+    }
+    
+    EVENTS }|--|| SYSTEMS : "system"
+    EVENTS }|--|| SYMBOLS : "symbol"
+    ORDERS }|--|| SYMBOLS : "symbol"
+    ORDER_EVENTS }|--|| ORDERS : "cl_ord_id"
+    EXECUTIONS }|--|| ORDERS : "cl_ord_id"
+    ORDER_EVENTS }|--|| EVENTS : "event_id"
+```
+
+
+
 We use a control table in Postgres:
 
 ```sql
