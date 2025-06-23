@@ -27,18 +27,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  dagster:
-    image: dagster/dagster:latest
-    container_name: dagster
-    ports:
-      - "3000:3000"
-    environment:
-      DAGSTER_POSTGRES_USER: admin
-      DAGSTER_POSTGRES_PASSWORD: admin
-      DAGSTER_POSTGRES_DB: fix_db
-    depends_on:
-      - postgres
-
   superset:
     image: apache/superset:latest
     container_name: superset

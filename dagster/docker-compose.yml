@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.7"
 
 services:
   # This service runs the postgres DB used by dagster for run storage, schedule storage,
@@ -8,13 +8,13 @@ services:
     image: postgres:11
     container_name: docker_example_postgresql
     environment:
-      POSTGRES_USER: 'postgres_user'
-      POSTGRES_PASSWORD: 'postgres_password'
-      POSTGRES_DB: 'postgres_db'
+      POSTGRES_USER: "postgres_user"
+      POSTGRES_PASSWORD: "postgres_password"
+      POSTGRES_DB: "postgres_db"
     networks:
       - docker_example_network
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres_user -d postgres_db']
+      test: ["CMD-SHELL", "pg_isready -U postgres_user -d postgres_db"]
       interval: 10s
       timeout: 8s
       retries: 5
@@ -24,7 +24,7 @@ services:
   # run launcher to use this same image when launching runs in a new container as well.
   # Multiple containers like this can be deployed separately - each just needs to run on
   # its own port, and have its own entry in the workspace.yaml file that's loaded by the
-  # webserver.
+      # webserver.
   docker_example_user_code:
     build:
       context: .
@@ -33,10 +33,27 @@ services:
     image: docker_example_user_code_image
     restart: always
     environment:
-      DAGSTER_POSTGRES_USER: 'postgres_user'
-      DAGSTER_POSTGRES_PASSWORD: 'postgres_password'
-      DAGSTER_POSTGRES_DB: 'postgres_db'
-      DAGSTER_CURRENT_IMAGE: 'docker_example_user_code_image'
+      DAGSTER_POSTGRES_USER: "postgres_user"
+      DAGSTER_POSTGRES_PASSWORD: "postgres_password"
+      DAGSTER_POSTGRES_DB: "postgres_db"
+      DAGSTER_CURRENT_IMAGE: "docker_example_user_code_image"
+    networks:
+      - docker_example_network
+
+  
+
+  docker_binance_flow_code:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_user_code
+    container_name: docker_example_user_code
+    image: docker_example_user_code_image
+    restart: always
+    environment:
+      DAGSTER_POSTGRES_USER: "postgres_user"
+      DAGSTER_POSTGRES_PASSWORD: "postgres_password"
+      DAGSTER_POSTGRES_DB: "postgres_db"
+      DAGSTER_CURRENT_IMAGE: "docker_example_user_code_image"
     networks:
       - docker_example_network
 
@@ -50,20 +67,20 @@ services:
     entrypoint:
       - dagster-webserver
       - -h
-      - '0.0.0.0'
+      - "0.0.0.0"
       - -p
-      - '3000'
+      - "3000"
       - -w
       - workspace.yaml
     container_name: docker_example_webserver
     expose:
-      - '3000'
+      - "3000"
     ports:
-      - '3000:3000'
+      - "3000:3000"
     environment:
-      DAGSTER_POSTGRES_USER: 'postgres_user'
-      DAGSTER_POSTGRES_PASSWORD: 'postgres_password'
-      DAGSTER_POSTGRES_DB: 'postgres_db'
+      DAGSTER_POSTGRES_USER: "postgres_user"
+      DAGSTER_POSTGRES_PASSWORD: "postgres_password"
+      DAGSTER_POSTGRES_DB: "postgres_db"
     volumes: # Make docker client accessible so we can terminate containers from the webserver
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/io_manager_storage:/tmp/io_manager_storage
@@ -87,9 +104,9 @@ services:
     container_name: docker_example_daemon
     restart: on-failure
     environment:
-      DAGSTER_POSTGRES_USER: 'postgres_user'
-      DAGSTER_POSTGRES_PASSWORD: 'postgres_password'
-      DAGSTER_POSTGRES_DB: 'postgres_db'
+      DAGSTER_POSTGRES_USER: "postgres_user"
+      DAGSTER_POSTGRES_PASSWORD: "postgres_password"
+      DAGSTER_POSTGRES_DB: "postgres_db"
     volumes: # Make docker client accessible so we can launch containers using host docker
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/io_manager_storage:/tmp/io_manager_storage
