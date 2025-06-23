@@ -1,0 +1,78 @@
+version: "3.8"
+
+services:
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: fix_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  dagster:
+    image: dagster/dagster:latest
+    container_name: dagster
+    ports:
+      - "3000:3000"
+    environment:
+      DAGSTER_POSTGRES_USER: admin
+      DAGSTER_POSTGRES_PASSWORD: admin
+      DAGSTER_POSTGRES_DB: fix_db
+    depends_on:
+      - postgres
+
+  superset:
+    image: apache/superset:latest
+    container_name: superset
+    ports:
+      - "8088:8088"
+    environment:
+      SUPERSET_SECRET_KEY: 'thisISaSECRET_1234'
+      ADMIN_USERNAME: admin
+      ADMIN_EMAIL: admin@superset.com
+      ADMIN_PASSWORD: admin
+    depends_on:
+      - postgres
+    volumes:
+      - superset_home:/app/superset_home
+    command: >
+      /bin/bash -c "
+      superset db upgrade &&
+      superset fab create-admin --username admin --firstname Superset --lastname Admin --email admin@superset.com --password admin &&
+      superset init &&
+      superset run -h 0.0.0.0 -p 8088"
+    
+  quickfix:
+    build:
+      context: ./quickfix
+      dockerfile: Dockerfile
+    container_name: quickfix
+    depends_on:
+      - minio
+      - postgres
+    volumes:
+      - ./quickfix:/app
+    command: python3 parser.py
+
+volumes:
+  minio_data:
+  postgres_data:
+  superset_home:
