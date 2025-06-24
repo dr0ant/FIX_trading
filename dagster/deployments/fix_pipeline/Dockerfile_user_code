@@ -1,0 +1,24 @@
+FROM python:3.10-slim
+
+# Set up working directory
+WORKDIR /tmp
+
+# Install Dagster dependencies
+RUN pip install \
+    dagster \
+    dagster-graphql \
+    dagster-webserver \
+    dagster-postgres \
+    dagster-docker
+
+# Move to application directory
+WORKDIR /opt/dagster/app
+
+# Copy repo file into image (relative to build context)
+COPY repo.py /opt/dagster/app
+
+# Expose gRPC port
+EXPOSE 4000
+
+# Start the Dagster gRPC server
+CMD ["dagster", "api", "grpc", "-h", "0.0.0.0", "-p", "4000", "-f", "repo.py"]
