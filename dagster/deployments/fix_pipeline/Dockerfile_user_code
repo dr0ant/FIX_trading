@@ -9,16 +9,26 @@ RUN pip install \
     dagster-graphql \
     dagster-webserver \
     dagster-postgres \
-    dagster-docker
+    dagster-docker  \
+    pandas  \
+    psycopg2-binary  \
+    pyarrow  \
+    boto3  \
+    dagster-pandas  \
+    dagit  \
+    dbt-postgres  \
+    dbt-core  \
+    minio  
+
 
 # Move to application directory
 WORKDIR /opt/dagster/app
 
 # Copy repo file into image (relative to build context)
-COPY repo.py /opt/dagster/app
+COPY fix_sensor.py /opt/dagster/app
 
 # Expose gRPC port
 EXPOSE 4000
 
 # Start the Dagster gRPC server
-CMD ["dagster", "api", "grpc", "-h", "0.0.0.0", "-p", "4000", "-f", "repo.py"]
+CMD ["dagster", "api", "grpc", "-h", "0.0.0.0", "-p", "4000", "-f", "fix_sensor.py"]

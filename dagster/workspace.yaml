@@ -1,5 +1,5 @@
 load_from:
   - grpc_server:
-      host: fix_pipeline_user_code
+      host: docker_fix_pipeline_user_code
       port: 4000
       location_name: "fix_pipeline_user_code"
