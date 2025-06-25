@@ -10,5 +10,6 @@ dbt-postgres
 dbt-core
 dbt-duckdb
 dagster-webserver
+minio
 
 

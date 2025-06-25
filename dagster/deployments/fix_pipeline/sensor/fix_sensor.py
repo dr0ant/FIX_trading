@@ -1,9 +1,11 @@
+import io
+import os
+import subprocess
+import pandas as pd
+from datetime import datetime, date
 import boto3
 import psycopg2
-import pandas as pd
-import io
-import subprocess
-from datetime import datetime, date
+
 from dagster import (
     sensor,
     RunRequest,
@@ -14,9 +16,22 @@ from dagster import (
     Definitions,
 )
 
+# --- FIX Converter Class ---
+class FixToParquetConverter:
+    def parse_fix_lines(self, fix_text):
+        records = []
+        for line in fix_text.splitlines():
+            if '8=FIX' not in line:
+                continue
+            fix_message = line.split('8=FIX', 1)[-1]
+            fix_message = '8=FIX' + fix_message
+            fix_message = fix_message.strip().split('|')
+            parsed = {kv.split('=')[0]: kv.split('=')[1] for kv in fix_message if '=' in kv}
+            records.append(parsed)
+        return pd.DataFrame(records)
+
 
 # --- Resources ---
-
 class MinioResource(ConfigurableResource):
     endpoint_url: str
     access_key: str
@@ -44,12 +59,12 @@ class PostgresResource(ConfigurableResource):
 
 
 # --- OP ---
-
 @op(required_resource_keys={"minio", "postgres"}, config_schema={"files": list})
 def process_new_files(context):
     minio = context.resources.minio.get_client()
     conn = context.resources.postgres.get_conn()
     cur = conn.cursor()
+    parser = FixToParquetConverter()
 
     bucket_source = "textfixlogs"
     bucket_target = "parquetfixlogs"
@@ -59,28 +74,27 @@ def process_new_files(context):
     for filename in context.op_config["files"]:
         context.log.info(f"Starting to process: {filename}")
 
-        # Get file from MinIO
-        context.log.info(f"Downloading {filename} from bucket {bucket_source}")
+        # Download FIX log from MinIO
         obj = minio.get_object(Bucket=bucket_source, Key=filename)
-        df = pd.read_csv(io.BytesIO(obj["Body"].read()))
+        fix_text = obj["Body"].read().decode("utf-8")
+        df = parser.parse_fix_lines(fix_text)
         nb_lines = len(df)
-        context.log.info(f"File {filename} has {nb_lines} lines")
+        context.log.info(f"Parsed {nb_lines} lines from {filename}")
 
-        # Convert to Parquet in memory
+        # Convert to Parquet
         parquet_buffer = io.BytesIO()
         df.to_parquet(parquet_buffer, index=False)
 
-        # Upload Parquet to target bucket
-        parquet_key = filename.replace(".csv", ".parquet")
-        context.log.info(f"Uploading {parquet_key} to bucket {bucket_target}")
+        # Upload Parquet
+        parquet_key = filename.replace(".txt", ".parquet")
+        context.log.info(f"Uploading {parquet_key} to {bucket_target}")
         minio.put_object(
             Bucket=bucket_target,
             Key=parquet_key,
             Body=parquet_buffer.getvalue(),
         )
 
-        # Insert metadata into Postgres
-        context.log.info(f"Inserting metadata for {filename} into Postgres")
+        # Log to Postgres
         cur.execute("""
             INSERT INTO processed_files (file_name, file_source, process_date, execution_time, nb_lines)
             VALUES (%s, %s, %s, %s, %s)
@@ -88,61 +102,54 @@ def process_new_files(context):
         """, (filename, bucket_source, process_date, execution_time, nb_lines))
         conn.commit()
 
-        context.log.info(f"Finished processing: {filename}")
+        context.log.info(f"✅ Processed and recorded: {filename}")
 
-    # Run dbt model
-    context.log.info("Running dbt model...")
+    # Optional: run dbt
     try:
         subprocess.run(["dbt", "run", "--select", "your_model"], check=True)
-        context.log.info("DBT model executed successfully.")
+        context.log.info("✅ DBT model executed")
     except subprocess.CalledProcessError as e:
-        context.log.error(f"DBT execution failed: {e}")
+        context.log.error(f"❌ DBT run failed: {e}")
         raise
 
     cur.close()
     conn.close()
-    context.log.info("Closed Postgres connection.")
 
 
 # --- JOB ---
-
 @job
-def my_processing_job():
+def fix_processing_job():
     process_new_files()
 
 
 # --- SENSOR ---
-
 @sensor(
-    job=my_processing_job,
+    job=fix_processing_job,
     minimum_interval_seconds=60,
     required_resource_keys={"minio", "postgres"},
 )
-def new_minio_file_sensor(context):
+def new_fix_file_sensor(context):
     bucket = "textfixlogs"
-    context.log.info("Starting sensor: checking for new files in bucket 'textfixlogs'")
+    context.log.info("🔍 Scanning MinIO bucket for new FIX files")
 
     minio_client = context.resources.minio.get_client()
     conn = context.resources.postgres.get_conn()
-    cursor = conn.cursor()
+    cur = conn.cursor()
 
-    context.log.info("Ensuring processed_files table exists")
-    cursor.execute("""
+    cur.execute("""
         CREATE TABLE IF NOT EXISTS processed_files (
             file_name TEXT PRIMARY KEY,
             file_source TEXT,
             process_date DATE,
             execution_time TIMESTAMP,
             nb_lines INT
-        )
+        );
     """)
     conn.commit()
 
-    context.log.info("Fetching list of already processed files")
-    cursor.execute("SELECT file_name FROM processed_files")
-    already_processed = {row[0] for row in cursor.fetchall()}
+    cur.execute("SELECT file_name FROM processed_files;")
+    already_processed = {row[0] for row in cur.fetchall()}
 
-    context.log.info("Listing all files in MinIO bucket...")
     paginator = minio_client.get_paginator("list_objects_v2")
     pages = paginator.paginate(Bucket=bucket)
     all_files = []
@@ -150,17 +157,14 @@ def new_minio_file_sensor(context):
         for obj in page.get("Contents", []):
             all_files.append(obj["Key"])
 
-    context.log.info(f"All files in bucket: {all_files}")
-
-    new_files = [f for f in all_files if f not in already_processed]
-    context.log.info(f"New unprocessed files: {new_files}")
+    new_files = [f for f in all_files if f.endswith(".txt") and f not in already_processed]
+    context.log.info(f"🆕 Found {len(new_files)} new file(s): {new_files}")
 
     if not new_files:
-        context.log.info("No new files found. Skipping run.")
-        return SkipReason("No new files found.")
+        return SkipReason("No new files to process.")
 
     return RunRequest(
-        run_key=f"new-files-{context.cursor or 'start'}",
+        run_key=f"run-{datetime.utcnow().isoformat()}",
         run_config={
             "ops": {
                 "process_new_files": {
@@ -172,10 +176,9 @@ def new_minio_file_sensor(context):
 
 
 # --- DEFINITIONS ---
-
 defs = Definitions(
-    jobs=[my_processing_job],
-    sensors=[new_minio_file_sensor],
+    jobs=[fix_processing_job],
+    sensors=[new_fix_file_sensor],
     resources={
         "minio": MinioResource(
             endpoint_url="http://localhost:9000",
