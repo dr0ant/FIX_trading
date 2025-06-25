@@ -1,34 +1,36 @@
 {{ 
   config(
-    materialized='table'
+    materialized='table',
+    schema='landing_fix',
+    alias='fix_trading_raw'
   ) 
 }}
 
 SELECT
-  filename,
-  timestamp,
-  system,
-  fix_tags ->> '35' AS msg_type,
-  fix_tags ->> '11' AS cl_ord_id,
-  fix_tags ->> '37' AS order_id,
-  fix_tags ->> '17' AS exec_id,
-  fix_tags ->> '150' AS exec_type,
-  fix_tags ->> '39' AS ord_status,
-  fix_tags ->> '1'   AS account,
-  fix_tags ->> '55'  AS symbol,
-  fix_tags ->> '54'  AS side,
-  fix_tags ->> '15'  AS currency,
-  fix_tags ->> '44'  AS price,
-  fix_tags ->> '38'  AS quantity,
-  fix_tags ->> '60'  AS transact_time,
-  fix_tags ->> '49'  AS sender_comp_id,
-  fix_tags ->> '56'  AS target_comp_id,
-  fix_tags ->> '59'  AS time_in_force,
-  fix_tags ->> '10'  AS checksum,
-  fix_tags ->> '9'   AS body_length,
-  fix_tags ->> '8'   AS begin_string,
-  fix_tags ->> '34'  AS msg_seq_num,
-  fix_tags ->> '52'  AS sending_time,
-  fix_tags ->> '526' AS secondary_cl_ord_id
+  filename,  -- Optional: only if added manually during parsing
+  "52" AS timestamp,
+  "49" AS system,
+  "35" AS msg_type,
+  "11" AS cl_ord_id,
+  "37" AS order_id,
+  "17" AS exec_id,
+  "150" AS exec_type,
+  "39" AS ord_status,
+  "1"   AS account,
+  "55"  AS symbol,
+  "54"  AS side,
+  "15"  AS currency,
+  "44"  AS price,
+  "38"  AS quantity,
+  "60"  AS transact_time,
+  "49"  AS sender_comp_id,
+  "56"  AS target_comp_id,
+  "59"  AS time_in_force,
+  "10"  AS checksum,
+  "9"   AS body_length,
+  "8"   AS begin_string,
+  "34"  AS msg_seq_num,
+  "52"  AS sending_time,
+  "526" AS secondary_cl_ord_id
 FROM read_parquet('s3://parquetfixlogs/*.parquet')
-WHERE fix_tags IS NOT NULL
+ORDER BY "52"
