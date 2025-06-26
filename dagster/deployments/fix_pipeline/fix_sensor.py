@@ -104,13 +104,13 @@ def process_new_files(context):
 
         context.log.info(f"✅ Processed and recorded: {filename}")
 
-    # Optional: run dbt
-    try:
-        subprocess.run(["dbt", "run", "--select", "your_model"], check=True)
-        context.log.info("✅ DBT model executed")
-    except subprocess.CalledProcessError as e:
-        context.log.error(f"❌ DBT run failed: {e}")
-        raise
+    ## Optional: run dbt
+    #try:
+    #    subprocess.run(["dbt", "run", "--select", "your_model"], check=True)
+    #    context.log.info("✅ DBT model executed")
+    #except subprocess.CalledProcessError as e:
+    #    context.log.error(f"❌ DBT run failed: {e}")
+    #    raise
 
     cur.close()
     conn.close()
@@ -181,12 +181,12 @@ defs = Definitions(
     sensors=[new_fix_file_sensor],
     resources={
         "minio": MinioResource(
-            endpoint_url="http://localhost:9000",
+            endpoint_url="http://minio:9000",
             access_key="minioadmin",
             secret_key="minioadmin",
         ),
         "postgres": PostgresResource(
-            host="localhost",
+            host="postgres",
             dbname="fix_db",
             user="admin",
             password="admin",
