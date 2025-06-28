@@ -11,8 +11,9 @@
 
 WITH base AS (
   SELECT
-    try_cast(timestamp AS timestamp) AS msg_timestamp,
-    try_cast(transact_time AS timestamp) AS transact_time,
+  	STRPTIME(timestamp, '%Y%m%d-%H:%M:%S.%f')::timestamp AS msg_timestamp,
+  	STRPTIME('2023-03-09-09:30:05.063', '%Y-%m-%d-%H:%M:%S.%f')::timestamp as transact_time,
+  	STRPTIME(sending_time, '%Y%m%d-%H:%M:%S.%f')::timestamp AS sending_time,
     msg_type,
     cl_ord_id,
     secondary_cl_ord_id,
@@ -33,7 +34,6 @@ WITH base AS (
     try_cast(body_length AS int) AS body_length,
     try_cast(msg_seq_num AS int) AS msg_seq_num,
     begin_string,
-    try_cast(sending_time AS timestamp) AS sending_time,
     filename,
     system
   FROM {{ ref('landing_fix') }}
