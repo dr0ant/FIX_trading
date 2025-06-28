@@ -1,13 +1,9 @@
 import io
 import os
-import subprocess
 import pandas as pd
 from datetime import datetime, date
 import boto3
 import psycopg2
-
-from dbt_assets import dbt_assets
-
 
 from dagster import (
     sensor,
@@ -17,6 +13,10 @@ from dagster import (
     op,
     ConfigurableResource,
     Definitions,
+    AssetSelection,
+    define_asset_job,
+    load_assets_from_dbt_project,
+    RunConfig,
 )
 
 # --- FIX Converter Class ---
@@ -33,7 +33,6 @@ class FixToParquetConverter:
             records.append(parsed)
         return pd.DataFrame(records)
 
-
 # --- Resources ---
 class MinioResource(ConfigurableResource):
     endpoint_url: str
@@ -48,7 +47,6 @@ class MinioResource(ConfigurableResource):
             aws_secret_access_key=self.secret_key,
         )
 
-
 class PostgresResource(ConfigurableResource):
     host: str
     dbname: str
@@ -60,8 +58,7 @@ class PostgresResource(ConfigurableResource):
             host=self.host, dbname=self.dbname, user=self.user, password=self.password
         )
 
-
-# --- OP ---
+# --- OP: Ingestion & Parquetization ---
 @op(required_resource_keys={"minio", "postgres"}, config_schema={"files": list})
 def process_new_files(context):
     minio = context.resources.minio.get_client()
@@ -107,27 +104,27 @@ def process_new_files(context):
 
         context.log.info(f"✅ Processed and recorded: {filename}")
 
-    ## Optional: run dbt
-    #try:
-    #    subprocess.run(["dbt", "run", "--select", "your_model"], check=True)
-    #    context.log.info("✅ DBT model executed")
-    #except subprocess.CalledProcessError as e:
-    #    context.log.error(f"❌ DBT run failed: {e}")
-    #    raise
-
     cur.close()
     conn.close()
 
+# --- DBT ASSETS ---
+DBT_PROJECT_PATH = os.path.join(os.path.dirname(__file__), "pictet_fix_project")
+DBT_PROFILES_PATH = os.path.expanduser("~/.dbt")
 
-# --- JOB ---
+dbt_assets = load_assets_from_dbt_project(
+    project_dir=DBT_PROJECT_PATH,
+    profiles_dir=DBT_PROFILES_PATH,
+)
+
+# --- JOB: Ingestion + DBT ---
 @job
-def fix_processing_job():
+def fix_ingest_and_dbt_job():
     process_new_files()
-
+    dbt_assets()  # Exécute tous les assets dbt après l'ingestion
 
 # --- SENSOR ---
 @sensor(
-    job=fix_processing_job,
+    job=fix_ingest_and_dbt_job,
     minimum_interval_seconds=60,
     required_resource_keys={"minio", "postgres"},
 )
@@ -177,10 +174,10 @@ def new_fix_file_sensor(context):
         },
     )
 
-
 # --- DEFINITIONS ---
 defs = Definitions(
-    jobs=[fix_processing_job],
+    assets=[dbt_assets],
+    jobs=[fix_ingest_and_dbt_job],
     sensors=[new_fix_file_sensor],
     resources={
         "minio": MinioResource(
