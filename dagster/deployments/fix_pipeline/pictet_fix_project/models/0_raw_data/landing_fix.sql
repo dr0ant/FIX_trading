@@ -34,3 +34,4 @@ SELECT
   "526" AS secondary_cl_ord_id
 FROM read_parquet('s3://parquetfixlogs/*.parquet')
 ORDER BY "52"
+
