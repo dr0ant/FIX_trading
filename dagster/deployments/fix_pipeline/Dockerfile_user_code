@@ -6,6 +6,7 @@ WORKDIR /tmp
 # Install Dagster dependencies
 RUN pip install \
     dagster \
+    dagster-dbt \
     dagster-graphql \
     dagster-webserver \
     dagster-postgres \
@@ -17,6 +18,7 @@ RUN pip install \
     dagster-pandas  \
     dagit  \
     dbt-postgres  \
+    dbt-duckdb  \
     dbt-core  \
     minio  
 
@@ -25,10 +27,16 @@ RUN pip install \
 WORKDIR /opt/dagster/app
 
 # Copy repo file into image (relative to build context)
-COPY fix_sensor.py /opt/dagster/app
+COPY . /opt/dagster/app
+
+COPY /pictet_fix_project/.dbt/profiles.yml /opt/dagster/app/pictet_fix_project/.dbt/profiles.yml
+
 
 # Expose gRPC port
 EXPOSE 4000
 
 # Start the Dagster gRPC server
-CMD ["dagster", "api", "grpc", "-h", "0.0.0.0", "-p", "4000", "-f", "fix_sensor.py"]
+# ...autres instructions...
+ENV DBT_TARGET=container
+
+CMD ["dagster", "api", "grpc", "-h", "0.0.0.0", "-p", "4000", "-f", "definition.py"]

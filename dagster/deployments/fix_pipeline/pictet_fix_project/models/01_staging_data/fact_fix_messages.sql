@@ -1,6 +1,4 @@
-{{ config(materialized='table', schema='mart_fix') }}
-
-select
+SELECT
   msg_timestamp,
   transact_time,
   msg_type,
@@ -16,5 +14,10 @@ select
   symbol,
   currency,
   sender_comp_id,
-  target_comp_id
-from {{ ref('stg_fix_trading') }}
+  target_comp_id,
+
+  -- Latency calculation (in milliseconds)
+  ROUND(EXTRACT('EPOCH' FROM msg_timestamp - 
+        LAG(msg_timestamp) OVER (PARTITION BY cl_ord_id ORDER BY msg_timestamp)) * 1000, 3) AS latency_ms
+
+FROM {{ ref('stg_fix_trading') }}

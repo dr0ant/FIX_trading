@@ -4,7 +4,7 @@ pictet_fix_project:
     # Local development profile
     dev:
       type: duckdb
-      path: /Users/larcher/FIX_trading/duck_db/duckdb_pictet  # Local path to DuckDB file
+      path: .duck_db/duckdb_pictet.db #/Users/larcher/FIX_trading/duck_db/duckdb_pictet  # Local path to DuckDB file
       threads: 4
       extensions:
         - httpfs
@@ -20,7 +20,7 @@ pictet_fix_project:
     # Containerized deployment profile
     container:
       type: duckdb
-      path: /opt/dagster/duck_db/duckdb_pictet  # Path inside the container
+      path: .duck_db/duckdb_pictet.db  # Path inside the container
       threads: 4
       extensions:
         - httpfs
