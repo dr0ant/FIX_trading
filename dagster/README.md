@@ -1,28 +1,80 @@
-# WizeDagster
- All my dagster flows deployed on NAS
+# FIX Trading Pipeline Project
 
- # command to run update code on the docker container 
- 1- update the file on the NAS then rebuild the image
- sudo docker-compose build docker_wize_obsidian_flow_code
+This project implements a FIX (Financial Information Exchange) trading pipeline using **Dagster** for orchestration, **dbt** for data transformations, **DuckDB** for local and containerized data storage, and **MinIO** for S3-compatible object storage. The pipeline processes FIX log files, converts them to Parquet format, and performs data transformations to generate insights and reports.
 
- 2- restart the container 
- sudo docker-compose up -d --no-deps docker_wize_obsidian_flow_code
+---
 
+## Project Overview
 
-# command to execute on the container to do the 2FA for Icloud
+### Key Components
+1. **Dagster**:
+   - Orchestrates the pipeline, including sensors, jobs, and resources.
+   - Monitors new FIX log files in MinIO and triggers processing and dbt transformations.
 
-sudo docker exec -it wize_obsidian /bin/bash
+2. **dbt**:
+   - Performs SQL-based data transformations on the processed FIX data.
+   - Generates staging, fact, and dimension tables for reporting.
 
-root@fcec0f775e43:/opt/dagster/app# ls
+3. **DuckDB**:
+   - Lightweight database for local and containerized data storage.
+   - Stores raw and transformed FIX data.
 
-Markdown_to_postgres.py  __pycache__  dagster_load_icloud_into_db.py  icloud_md_files_getter.py  
-icloud_params.json  postgres_params.json
+4. **MinIO**:
+   - S3-compatible object storage for managing FIX log files and Parquet outputs.
 
-python3 icloud_md_files_getter.py 
+5. **PostgreSQL**:
+   - Tracks processed files and logs metadata for the pipeline.
 
+---
 
-# restart a specific container 
+## Pipeline Workflow
 
-sudo docker-compose down docker_dagster_epub_to_audiobook_code && sudo docker-compose up --build -d docker_dagster_epub_to_audiobook_code
+1. **FIX Log Ingestion**:
+   - A Dagster sensor monitors the `textfixlogs` bucket in MinIO for new FIX log files.
+   - New files are parsed, converted to Parquet, and uploaded to the `parquetfixlogs` bucket.
 
-Ok where is is pushed ?       
+2. **Data Transformation**:
+   - dbt transforms the Parquet data into staging, fact, and dimension tables.
+   - Aggregated KPIs (e.g., by symbol, system, and day) are generated for reporting.
+
+3. **Reporting**:
+   - The transformed data is available for analysis and visualization in tools like Superset.
+
+---
+
+## Project Structure
+
+```plaintext
+FIX_trading/
+├── dagster/
+│   ├── dagster.yaml                # Dagster instance configuration
+│   ├── workspace.yaml              # Dagster workspace configuration
+│   ├── docker-compose.yml          # Docker Compose file for the entire stack
+│   ├── [README.md](http://_vscodecontentref_/1)                   # Project documentation
+│   ├── deployments/
+│   │   ├── fix_pipeline/
+│   │   │   ├── fix_sensor.py       # Dagster sensor for FIX log ingestion
+│   │   │   ├── fix_sensor_new.py   # Alternate sensor implementation
+│   │   │   ├── dbt_assets.py       # dbt asset loader for Dagster
+│   │   │   ├── Dockerfile_user_code # Dockerfile for Dagster user code
+│   │   │   ├── pictet_fix_project/ # dbt project directory
+│   │   │   │   ├── dbt_project.yml # dbt project configuration
+│   │   │   │   ├── models/         # dbt models for transformations
+│   │   │   │   ├── .dbt/           # dbt profiles for local and containerized runs
+├── duck_db/                        # Directory for DuckDB files
+│   ├── duckdb_pictet               # DuckDB database file
+├── quickfix/
+│   ├── text_to_parquet.py          # Standalone script for FIX log processing
+
+dbt run --profiles-dir ~/.dbt --target dev -s <model_name>
+
+dagster dev -f dagster/deployments/fix_pipeline/fix_sensor.py
+
+docker-compose up --build
+
+Access Services:
+
+- Dagster UI: http://localhost:3000
+- MinIO Console: http://localhost:9001
+- Superset: http://localhost:8088
+
