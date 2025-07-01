@@ -3,25 +3,27 @@ FROM python:3.10-slim
 # Set up working directory
 WORKDIR /tmp
 
-# Install Dagster dependencies
-RUN pip install \
-    dagster \
-    dagster-dbt \
-    dagster-graphql \
-    dagster-webserver \
-    dagster-postgres \
-    dagster-docker  \
-    pandas  \
-    psycopg2-binary  \
-    pyarrow  \
-    boto3  \
-    dagster-pandas  \
-    dagit  \
-    dbt-postgres  \
-    dbt-duckdb  \
-    dbt-core  \
-    minio  
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    && rm -rf /var/lib/apt/lists/*
 
+# Install Dagster dependencies with compatible versions
+RUN pip install \
+    dagster==1.11.0 \
+    dagster-graphql==1.11.0 \
+    dagster-webserver==1.11.0 \
+    dagster-postgres==0.27.0 \
+    dagster-docker==0.27.0 \
+    dagster-pandas==0.27.0 \
+    dagster-dbt==0.27.0 \
+    pandas \
+    psycopg2-binary \
+    pyarrow \
+    boto3 \
+    dbt-postgres \
+    dbt-core \
+    minio
 
 # Move to application directory
 WORKDIR /opt/dagster/app
@@ -29,14 +31,20 @@ WORKDIR /opt/dagster/app
 # Copy repo file into image (relative to build context)
 COPY . /opt/dagster/app
 
+# Copy profiles.yml to the correct location
 COPY /pictet_fix_project/.dbt/profiles.yml /opt/dagster/app/pictet_fix_project/.dbt/profiles.yml
 
+# Set environment variables
+ENV DBT_TARGET=container
+ENV DAGSTER_HOME=/opt/dagster/app
+
+# Create dbt manifest (this might fail initially, but we'll handle it in the code)
+RUN cd /opt/dagster/app/pictet_fix_project && \
+    (dbt deps --profiles-dir .dbt --target container || true) && \
+    (dbt parse --profiles-dir .dbt --target container || true)
 
 # Expose gRPC port
 EXPOSE 4000
 
 # Start the Dagster gRPC server
-# ...autres instructions...
-ENV DBT_TARGET=container
-
 CMD ["dagster", "api", "grpc", "-h", "0.0.0.0", "-p", "4000", "-f", "definition.py"]
