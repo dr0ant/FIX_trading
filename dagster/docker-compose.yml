@@ -31,7 +31,7 @@ services:
       - postgres
     volumes:
       - superset_home:/app/superset_home
-      - ./duck_db:/opt/duck_db  #
+      - ./deployments/fix_pipeline/.duck_db:/opt/duck_db
     command: >
       /bin/bash -c "
       pip install duckdb-engine psycopg2-binary &&
@@ -88,6 +88,8 @@ services:
       - dagster_network
     ports:
       - "4000:4000"
+    volumes:
+      - ./deployments/fix_pipeline/.duck_db:/opt/dagster/app/pictet_fix_project/.duck_db
 
   docker_example_webserver:
     build:

@@ -1,14 +1,15 @@
 import io
-import os
-import subprocess
-import pandas as pd
-from datetime import datetime, date
 import boto3
 import psycopg2
-from dagster import op, ConfigurableResource
+import pandas as pd
+from datetime import datetime, date
+
 
 # --- FIX Converter Class ---
 class FixToParquetConverter:
+    """
+    A utility class to parse FIX log lines and convert them to a DataFrame.
+    """
     def parse_fix_lines(self, fix_text):
         records = []
         for line in fix_text.splitlines():
@@ -21,62 +22,26 @@ class FixToParquetConverter:
             records.append(parsed)
         return pd.DataFrame(records)
 
-# --- Resources ---
-class MinioResource(ConfigurableResource):
-    endpoint_url: str
-    access_key: str
-    secret_key: str
 
-    def get_client(self):
-        return boto3.client(
-            "s3",
-            endpoint_url=self.endpoint_url,
-            aws_access_key_id=self.access_key,
-            aws_secret_access_key=self.secret_key,
-        )
-
-class PostgresResource(ConfigurableResource):
-    host: str
-    dbname: str
-    user: str
-    password: str
-
-    def get_conn(self):
-        return psycopg2.connect(
-            host=self.host, dbname=self.dbname, user=self.user, password=self.password
-        )
-
-# --- Updated OP to handle both sensor-triggered and manual runs ---
+# --- File Processing Function ---
 def process_new_files(context, files=None):
     """
-    Process new files - can be called directly or from an op.
+    Process new FIX files from MinIO and convert them to Parquet.
     """
-    # Get resources
-    if hasattr(context, 'resources'):
-        # Called from an op
-        minio_client = context.resources.minio.get_client()
-        conn = context.resources.postgres.get_conn()
-        
-        # Get files from op config if available
-        if files is None and hasattr(context, 'op_config'):
-            files = context.op_config.get("files", [])
-    else:
-        # Called directly - create resources
-        minio_resource = MinioResource(
-            endpoint_url="http://minio:9000",
-            access_key="minioadmin", 
-            secret_key="minioadmin"
-        )
-        postgres_resource = PostgresResource(
-            host="postgres",
-            dbname="fix_db",
-            user="admin",
-            password="admin"
-        )
-        minio_client = minio_resource.get_client()
-        conn = postgres_resource.get_conn()
-    
-    cur = conn.cursor()
+    # Hardcoded MinIO and PostgreSQL parameters
+    minio_client = boto3.client(
+        "s3",
+        endpoint_url="http://minio:9000",
+        aws_access_key_id="minioadmin",
+        aws_secret_access_key="minioadmin",
+    )
+    postgres_conn = psycopg2.connect(
+        host="postgres",
+        dbname="fix_db",
+        user="admin",
+        password="admin",
+    )
+    cur = postgres_conn.cursor()
     parser = FixToParquetConverter()
 
     bucket_source = "textfixlogs"
@@ -84,7 +49,7 @@ def process_new_files(context, files=None):
     process_date = date.today()
     execution_time = datetime.now()
 
-    # If no files specified, get all unprocessed files
+    # If no files specified, fetch unprocessed files
     if not files:
         # Create table if it doesn't exist
         cur.execute("""
@@ -96,75 +61,60 @@ def process_new_files(context, files=None):
                 nb_lines INT
             );
         """)
-        conn.commit()
-        
+        postgres_conn.commit()
+
         # Get already processed files
         cur.execute("SELECT file_name FROM processed_files;")
         already_processed = {row[0] for row in cur.fetchall()}
-        
-        # List all files in bucket
-        try:
-            paginator = minio_client.get_paginator("list_objects_v2")
-            pages = paginator.paginate(Bucket=bucket_source)
-            all_files = []
-            for page in pages:
-                for obj in page.get("Contents", []):
-                    all_files.append(obj["Key"])
-            
-            files = [f for f in all_files if f.endswith(".txt") and f not in already_processed]
-        except Exception as e:
-            if hasattr(context, 'log'):
-                context.log.error(f"Error listing files: {e}")
-            cur.close()
-            conn.close()
-            return
+
+        # List all files in the bucket
+        paginator = minio_client.get_paginator("list_objects_v2")
+        pages = paginator.paginate(Bucket=bucket_source)
+        all_files = []
+        for page in pages:
+            for obj in page.get("Contents", []):
+                all_files.append(obj["Key"])
+
+        files = [f for f in all_files if f.endswith(".txt") and f not in already_processed]
 
     # Process each file
     for filename in files:
-        if hasattr(context, 'log'):
-            context.log.info(f"Starting to process: {filename}")
-
+        context.log.info(f"Processing file: {filename}")
         try:
             # Download FIX log from MinIO
             obj = minio_client.get_object(Bucket=bucket_source, Key=filename)
             fix_text = obj["Body"].read().decode("utf-8")
             df = parser.parse_fix_lines(fix_text)
             nb_lines = len(df)
-            
-            if hasattr(context, 'log'):
-                context.log.info(f"Parsed {nb_lines} lines from {filename}")
+
+            # Ensure DataFrame is not empty
+            if df.empty:
+                context.log.warning(f"File {filename} contains no valid FIX messages.")
+                continue
 
             # Convert to Parquet
             parquet_buffer = io.BytesIO()
             df.to_parquet(parquet_buffer, index=False)
 
-            # Upload Parquet
+            # Upload Parquet to MinIO
             parquet_key = filename.replace(".txt", ".parquet")
-            if hasattr(context, 'log'):
-                context.log.info(f"Uploading {parquet_key} to {bucket_target}")
-            
             minio_client.put_object(
                 Bucket=bucket_target,
                 Key=parquet_key,
                 Body=parquet_buffer.getvalue(),
             )
 
-            # Log to Postgres
+            # Log to PostgreSQL
             cur.execute("""
                 INSERT INTO processed_files (file_name, file_source, process_date, execution_time, nb_lines)
                 VALUES (%s, %s, %s, %s, %s)
                 ON CONFLICT (file_name) DO NOTHING
             """, (filename, bucket_source, process_date, execution_time, nb_lines))
-            conn.commit()
+            postgres_conn.commit()
 
-            if hasattr(context, 'log'):
-                context.log.info(f"✅ Processed and recorded: {filename}")
-                
+            context.log.info(f"✅ Successfully processed: {filename}")
         except Exception as e:
-            if hasattr(context, 'log'):
-                context.log.error(f"Error processing {filename}: {e}")
-            else:
-                print(f"Error processing {filename}: {e}")
+            context.log.error(f"Error processing {filename}: {e}")
 
     cur.close()
-    conn.close()
+    postgres_conn.close()

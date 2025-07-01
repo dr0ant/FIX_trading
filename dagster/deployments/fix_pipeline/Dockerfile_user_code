@@ -23,6 +23,7 @@ RUN pip install \
     boto3 \
     dbt-postgres \
     dbt-core \
+    dbt-duckdb \  
     minio
 
 # Move to application directory
