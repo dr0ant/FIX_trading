@@ -1,10 +1,11 @@
-from dagster import Definitions, job, op, sensor, RunRequest, SkipReason
+from dagster import Definitions, job, op, sensor, RunRequest, SkipReason, Output
 from dagster_dbt import DbtCliResource, dbt_assets
 from fix_sensor import process_new_files
 from datetime import datetime
 import os
 from pathlib import Path
 import subprocess
+import json
 import boto3
 import psycopg2
 
@@ -14,6 +15,7 @@ dbt_project_dir = current_dir / "pictet_fix_project"
 dbt_profiles_dir = dbt_project_dir / ".dbt"
 manifest_path = dbt_project_dir / "target" / "manifest.json"
 
+
 # Define the dbt CLI resource
 dbt_resource = DbtCliResource(
     project_dir=os.fspath(dbt_project_dir),
@@ -21,7 +23,39 @@ dbt_resource = DbtCliResource(
     target="container",
 )
 
-# Define the `dbt compile` operation
+# Define dbt assets
+@dbt_assets(manifest=os.fspath(manifest_path))
+def pictet_fix_dbt_assets(context, dbt: DbtCliResource):
+    yield from dbt.cli(["build"], context=context).stream()
+
+@op
+def dbt_run_op(context):
+    """Run dbt models directly without relying on manifest"""
+    try:
+        context.log.info("Running dbt models...")
+        result = subprocess.run(
+            [
+                "dbt",
+                "run",
+                "--profiles-dir",
+                os.fspath(dbt_profiles_dir),
+                "--target",
+                "container",
+            ],
+            cwd=os.fspath(dbt_project_dir),
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        context.log.info(f"dbt run output:\n{result.stdout}")
+        return Output(True)  # Simplified output without description
+    except subprocess.CalledProcessError as e:
+        context.log.error(f"dbt run failed:\n{e.stdout}\n{e.stderr}")
+        raise RuntimeError(f"Failed to run dbt models: {e}")
+
+
+
+
 @op
 def dbt_compile_op(context):
     if manifest_path.exists():
@@ -50,21 +84,22 @@ def dbt_compile_op(context):
 def pictet_fix_dbt_assets(context, dbt: DbtCliResource):
     yield from dbt.cli(["build"], context=context).stream()
 
-# Define the custom processing operation
+
+
 @op
 def process_fix_files_op(context):
+    """Process FIX files from MinIO"""
     files_to_process = context.run_config.get("ops", {}).get("process_fix_files_op", {}).get("config", {}).get("files", [])
     if not isinstance(files_to_process, list):
         raise ValueError("Invalid configuration: 'files' must be a list.")
     process_new_files(context, files=files_to_process)
-    context.log.info("File processing completed.")
+    context.log.info("File processing completed successfully")
 
 # Define the Dagster job
 @job(resource_defs={"dbt": dbt_resource})
 def fix_ingest_and_dbt_job():
-    dbt_compile_op()
     process_fix_files_op()
-    pictet_fix_dbt_assets()
+    dbt_run_op()
 
 # Define the sensor
 @sensor(
@@ -137,10 +172,10 @@ def new_fix_file_sensor(context):
 
 # Define Dagster Definitions
 defs = Definitions(
-    assets=[pictet_fix_dbt_assets],
     jobs=[fix_ingest_and_dbt_job],
+    assets=[pictet_fix_dbt_assets],
     sensors=[new_fix_file_sensor],
     resources={
-        "dbt": dbt_resource,  # Add the dbt resource here
+        "dbt": dbt_resource,
     },
 )
