@@ -150,6 +150,29 @@ FIX_trading/
 2. Create a feature branch
 3. Submit a pull request
 
+
+
+## Fancy screenshots
+
+### Superset Dashboard
+![Superset Dashboard showing FIX trading metrics with KPIs and charts](superset.png)
+
+### Dagster Sensor
+![Dagster sensor monitoring interface showing successful runs](/dagster_sensor.png)
+
+### Dagster Assets
+![Dagster Asset showing the dbt lineage](/Dagster_Assets.png)
+
+### Dagster Assets
+![Dagster Asset materialization showing history of materialization](/Dagster_Assets.png)
+
+### Minio Storage txt files 
+![Minio shows deposited by the servers raw txt files](/Minio_txt.png)
+
+### Minio Storage parquet files
+![Minio shows converted text files in parquet ready for modeling](/Minio_parquets.png)
+
+
 ## Collaboration
 
 We are in 2025, of course I use my LLMs friends to fasten the process thanks to :
