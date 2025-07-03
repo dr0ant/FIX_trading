@@ -1,7 +1,7 @@
 {{ 
   config(
     materialized='table',
-    schema='landing_fix',
+    schema='00_landing_fix',
     alias='fix_trading_raw'
   ) 
 }}

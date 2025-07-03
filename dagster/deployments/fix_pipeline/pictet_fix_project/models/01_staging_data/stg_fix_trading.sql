@@ -3,8 +3,8 @@
 
 {{
   config(
-    materialized='view',
-    schema='staging_fix'
+    materialized='table',
+    schema='01_staging_fix'
   )
 }}
 

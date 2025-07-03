@@ -55,3 +55,148 @@
 [0m14:21:05.407245 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x110acdb50>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x112ad6400>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x112ad6ac0>]}
 [0m14:21:05.407444 [debug] [MainThread]: Flushing usage events
 [0m14:21:05.825802 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m20:43:54.344232 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x1079ca920>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x108b0e980>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x108b0f940>]}
+
+
+============================== 20:43:54.347719 | 695b7184-5958-42be-969e-91d2d02e471f ==============================
+[0m20:43:54.347719 [info ] [MainThread]: Running with dbt=1.10.2
+[0m20:43:54.348085 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'indirect_selection': 'eager', 'write_json': 'True', 'log_cache_events': 'False', 'partial_parse': 'True', 'cache_selected_only': 'False', 'warn_error': 'None', 'fail_fast': 'False', 'debug': 'False', 'log_path': 'logs', 'profiles_dir': '/Users/antoinelarcher/.dbt', 'version_check': 'True', 'use_colors': 'True', 'use_experimental_parser': 'False', 'no_print': 'None', 'quiet': 'False', 'empty': 'None', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'introspect': 'True', 'static_parser': 'True', 'log_format': 'default', 'target_path': 'None', 'invocation_command': 'dbt debug', 'send_anonymous_usage_stats': 'True'}
+[0m20:43:54.358867 [info ] [MainThread]: dbt version: 1.10.2
+[0m20:43:54.359157 [info ] [MainThread]: python version: 3.10.4
+[0m20:43:54.359326 [info ] [MainThread]: python path: /Users/antoinelarcher/Documents/git_pictet/.venv/bin/python3
+[0m20:43:54.359483 [info ] [MainThread]: os info: macOS-15.5-arm64-arm-64bit
+[0m20:43:54.448670 [info ] [MainThread]: Using profiles dir at /Users/antoinelarcher/.dbt
+[0m20:43:54.449047 [info ] [MainThread]: Using profiles.yml file at /Users/antoinelarcher/.dbt/profiles.yml
+[0m20:43:54.449228 [info ] [MainThread]: Using dbt_project.yml file at /Users/antoinelarcher/Documents/git_pictet/FIX_trading/dagster/dbt_project.yml
+[0m20:43:54.450574 [info ] [MainThread]: adapter type: duckdb
+[0m20:43:54.450855 [info ] [MainThread]: adapter version: 1.9.3
+[0m20:43:54.451030 [info ] [MainThread]: Configuration:
+[0m20:43:54.451179 [info ] [MainThread]:   profiles.yml file [[32mOK found and valid[0m]
+[0m20:43:54.451325 [info ] [MainThread]:   dbt_project.yml file [[31mERROR not found[0m]
+[0m20:43:54.451466 [info ] [MainThread]: Required dependencies:
+[0m20:43:54.451667 [debug] [MainThread]: Executing "git --help"
+[0m20:43:54.470091 [debug] [MainThread]: STDOUT: "b"usage : git [-v | --version] [-h | --help] [-C <chemin>] [-c <nom>=<valeur>]\n           [--exec-path[=<chemin>]] [--html-path] [--man-path] [--info-path]\n           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--no-lazy-fetch]\n           [--no-optional-locks] [--no-advice] [--bare] [--git-dir=<chemin>]\n           [--work-tree=<chemin>] [--namespace=<nom>] [--config-env=<nom>=<var-d-env>] \n           <commande> [<args>]\n\nCi-dessous les commandes Git habituelles dans diverses situations\xc2\xa0:\n\nd\xc3\xa9marrer une zone de travail (voir aussi\xc2\xa0: git help tutorial)\n   clone     Cloner un d\xc3\xa9p\xc3\xb4t dans un nouveau r\xc3\xa9pertoire\n   init      Cr\xc3\xa9er un d\xc3\xa9p\xc3\xb4t Git vide ou r\xc3\xa9initialiser un existant\n\ntravailler sur la modification actuelle (voir aussi\xc2\xa0: git help revisions)\n   add       Ajouter le contenu de fichiers dans l'index\n   mv        D\xc3\xa9placer ou renommer un fichier, un r\xc3\xa9pertoire, ou un lien symbolique\n   restore   Restaurer les fichiers l'arbre de travail\n   rm        Supprimer des fichiers de la copie de travail et de l'index\n\nexaminer l'historique et l'\xc3\xa9tat (voir aussi\xc2\xa0: git help revisions)\n   bisect    Trouver par recherche binaire la modification qui a introduit un bogue\n   diff      Afficher les changements entre les validations, entre validation et copie de travail, etc\n   grep      Afficher les lignes correspondant \xc3\xa0 un motif\n   log       Afficher l'historique des validations\n   show      Afficher diff\xc3\xa9rents types d'objets\n   status    Afficher l'\xc3\xa9tat de la copie de travail\n\nagrandir, marquer et modifier votre historique\n   branch    Lister, cr\xc3\xa9er ou supprimer des branches\n   commit    Enregistrer les modifications dans le d\xc3\xa9p\xc3\xb4t\n   merge     Fusionner deux ou plusieurs historiques de d\xc3\xa9veloppement ensemble\n   rebase    R\xc3\xa9application des commits sur le sommet de l'autre base\n   reset     R\xc3\xa9initialiser la HEAD courante \xc3\xa0 l'\xc3\xa9tat sp\xc3\xa9cifi\xc3\xa9\n   switch    Basculer de branche\n   tag       Cr\xc3\xa9er, lister, supprimer ou v\xc3\xa9rifier un objet d'\xc3\xa9tiquette sign\xc3\xa9 avec GPG\n\ncollaborer (voir aussi\xc2\xa0: git help workflows)\n   fetch     T\xc3\xa9l\xc3\xa9charger les objets et r\xc3\xa9f\xc3\xa9rences depuis un autre d\xc3\xa9p\xc3\xb4t\n   pull      Rapatrier et int\xc3\xa9grer un autre d\xc3\xa9p\xc3\xb4t ou une branche locale\n   push      Mettre \xc3\xa0 jour les r\xc3\xa9f\xc3\xa9rences distantes ainsi que les objets associ\xc3\xa9s\n\n'git help -a' et 'git help -g' listent les sous-commandes disponibles et\nquelques concepts. Voir 'git help <commande>' ou 'git help <concept>'\npour en lire plus \xc3\xa0 propos d'une commande sp\xc3\xa9cifique ou d'un concept.\nVoir 'git help git' pour un survol du syst\xc3\xa8me.\n""
+[0m20:43:54.470803 [debug] [MainThread]: STDERR: "b''"
+[0m20:43:54.471009 [info ] [MainThread]:  - git [[32mOK found[0m]
+
+[0m20:43:54.471231 [info ] [MainThread]: Connection:
+[0m20:43:54.471434 [info ] [MainThread]:   database: duckdb_pictet
+[0m20:43:54.471582 [info ] [MainThread]:   schema: main
+[0m20:43:54.471726 [info ] [MainThread]:   path: /Users/antoinelarcher/Documents/git_pictet/FIX_trading/duck_db/duckdb_pictet
+[0m20:43:54.471868 [info ] [MainThread]:   config_options: None
+[0m20:43:54.472011 [info ] [MainThread]:   extensions: ['httpfs', 'parquet']
+[0m20:43:54.472159 [info ] [MainThread]:   settings: {'s3_region': 'us-east-1', 's3_url_style': 'path', 's3_endpoint': 'localhost:9000', 's3_access_key_id': 'minioadmin', 's3_secret_access_key': 'minioadmin', 's3_use_ssl': False}
+[0m20:43:54.472308 [info ] [MainThread]:   external_root: .
+[0m20:43:54.472446 [info ] [MainThread]:   use_credential_provider: None
+[0m20:43:54.472584 [info ] [MainThread]:   attach: None
+[0m20:43:54.472726 [info ] [MainThread]:   filesystems: None
+[0m20:43:54.472863 [info ] [MainThread]:   remote: None
+[0m20:43:54.473003 [info ] [MainThread]:   plugins: None
+[0m20:43:54.473140 [info ] [MainThread]:   disable_transactions: False
+[0m20:43:54.473539 [info ] [MainThread]: Registered adapter: duckdb=1.9.3
+[0m20:43:54.534750 [debug] [MainThread]: Acquiring new duckdb connection 'debug'
+[0m20:43:54.561758 [debug] [MainThread]: Using duckdb connection "debug"
+[0m20:43:54.562052 [debug] [MainThread]: On debug: select 1 as id
+[0m20:43:54.562225 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m20:43:54.590631 [debug] [MainThread]: DuckDB adapter: Error running SQL: select 1 as id
+[0m20:43:54.590940 [debug] [MainThread]: DuckDB adapter: Rolling back transaction.
+[0m20:43:54.591187 [info ] [MainThread]:   Connection test: [[31mERROR[0m]
+
+[0m20:43:54.591507 [info ] [MainThread]: [31m2 checks failed:[0m
+[0m20:43:54.591827 [info ] [MainThread]: Project loading failed for the following reason:
+ project path </Users/antoinelarcher/Documents/git_pictet/FIX_trading/dagster/dbt_project.yml> not found
+
+[0m20:43:54.592001 [info ] [MainThread]: dbt was unable to connect to the specified database.
+The database returned the following error:
+
+  >Runtime Error
+  IO Error: Cannot open file "/Users/antoinelarcher/Documents/git_pictet/FIX_trading/duck_db/duckdb_pictet": No such file or directory
+
+Check your database credentials and try again. For more information, visit:
+https://docs.getdbt.com/docs/configure-your-profile
+
+
+[0m20:43:54.594031 [debug] [MainThread]: Resource report: {"command_name": "debug", "command_success": false, "command_wall_clock_time": 0.30676636, "process_in_blocks": "0", "process_kernel_time": 0.193983, "process_mem_max_rss": "123879424", "process_out_blocks": "0", "process_user_time": 0.928669}
+[0m20:43:54.594479 [debug] [MainThread]: Command `dbt debug` failed at 20:43:54.594400 after 0.31 seconds
+[0m20:43:54.594722 [debug] [MainThread]: Connection 'debug' was properly closed.
+[0m20:43:54.594944 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x1079ca920>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x108cc1630>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x108cc1750>]}
+[0m20:43:54.595203 [debug] [MainThread]: Flushing usage events
+[0m20:43:55.397802 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m20:47:12.282928 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x106a06950>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x107d95ea0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x107d95a50>]}
+
+
+============================== 20:47:12.285972 | b0e8544b-e2ec-417b-9673-a62c920d9d80 ==============================
+[0m20:47:12.285972 [info ] [MainThread]: Running with dbt=1.10.2
+[0m20:47:12.286318 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'indirect_selection': 'eager', 'log_cache_events': 'False', 'write_json': 'True', 'partial_parse': 'True', 'cache_selected_only': 'False', 'warn_error': 'None', 'version_check': 'True', 'debug': 'False', 'log_path': 'logs', 'profiles_dir': '/antoinelarcher/Documents/git_pictet/FIX_trading/dagster/deployments/fix_pipeline/pictet_fix_project/.dbt', 'fail_fast': 'False', 'use_colors': 'True', 'use_experimental_parser': 'False', 'no_print': 'None', 'quiet': 'False', 'empty': 'None', 'log_format': 'default', 'invocation_command': 'dbt debug', 'introspect': 'True', 'static_parser': 'True', 'target_path': 'None', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'send_anonymous_usage_stats': 'True'}
+[0m20:47:12.295793 [info ] [MainThread]: dbt version: 1.10.2
+[0m20:47:12.296093 [info ] [MainThread]: python version: 3.10.4
+[0m20:47:12.296302 [info ] [MainThread]: python path: /Users/antoinelarcher/Documents/git_pictet/.venv/bin/python3
+[0m20:47:12.296473 [info ] [MainThread]: os info: macOS-15.5-arm64-arm-64bit
+[0m20:47:12.296645 [info ] [MainThread]: Using profiles dir at /antoinelarcher/Documents/git_pictet/FIX_trading/dagster/deployments/fix_pipeline/pictet_fix_project/.dbt
+[0m20:47:12.296809 [info ] [MainThread]: Using profiles.yml file at /antoinelarcher/Documents/git_pictet/FIX_trading/dagster/deployments/fix_pipeline/pictet_fix_project/.dbt/profiles.yml
+[0m20:47:12.297120 [info ] [MainThread]: Using dbt_project.yml file at /Users/antoinelarcher/Documents/git_pictet/FIX_trading/dagster/dbt_project.yml
+[0m20:47:12.297462 [info ] [MainThread]: Configuration:
+[0m20:47:12.297649 [info ] [MainThread]:   profiles.yml file [[31mERROR not found[0m]
+[0m20:47:12.297810 [info ] [MainThread]:   dbt_project.yml file [[31mERROR not found[0m]
+[0m20:47:12.297959 [info ] [MainThread]: Required dependencies:
+[0m20:47:12.298157 [debug] [MainThread]: Executing "git --help"
+[0m20:47:12.320060 [debug] [MainThread]: STDOUT: "b"usage : git [-v | --version] [-h | --help] [-C <chemin>] [-c <nom>=<valeur>]\n           [--exec-path[=<chemin>]] [--html-path] [--man-path] [--info-path]\n           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--no-lazy-fetch]\n           [--no-optional-locks] [--no-advice] [--bare] [--git-dir=<chemin>]\n           [--work-tree=<chemin>] [--namespace=<nom>] [--config-env=<nom>=<var-d-env>] \n           <commande> [<args>]\n\nCi-dessous les commandes Git habituelles dans diverses situations\xc2\xa0:\n\nd\xc3\xa9marrer une zone de travail (voir aussi\xc2\xa0: git help tutorial)\n   clone     Cloner un d\xc3\xa9p\xc3\xb4t dans un nouveau r\xc3\xa9pertoire\n   init      Cr\xc3\xa9er un d\xc3\xa9p\xc3\xb4t Git vide ou r\xc3\xa9initialiser un existant\n\ntravailler sur la modification actuelle (voir aussi\xc2\xa0: git help revisions)\n   add       Ajouter le contenu de fichiers dans l'index\n   mv        D\xc3\xa9placer ou renommer un fichier, un r\xc3\xa9pertoire, ou un lien symbolique\n   restore   Restaurer les fichiers l'arbre de travail\n   rm        Supprimer des fichiers de la copie de travail et de l'index\n\nexaminer l'historique et l'\xc3\xa9tat (voir aussi\xc2\xa0: git help revisions)\n   bisect    Trouver par recherche binaire la modification qui a introduit un bogue\n   diff      Afficher les changements entre les validations, entre validation et copie de travail, etc\n   grep      Afficher les lignes correspondant \xc3\xa0 un motif\n   log       Afficher l'historique des validations\n   show      Afficher diff\xc3\xa9rents types d'objets\n   status    Afficher l'\xc3\xa9tat de la copie de travail\n\nagrandir, marquer et modifier votre historique\n   branch    Lister, cr\xc3\xa9er ou supprimer des branches\n   commit    Enregistrer les modifications dans le d\xc3\xa9p\xc3\xb4t\n   merge     Fusionner deux ou plusieurs historiques de d\xc3\xa9veloppement ensemble\n   rebase    R\xc3\xa9application des commits sur le sommet de l'autre base\n   reset     R\xc3\xa9initialiser la HEAD courante \xc3\xa0 l'\xc3\xa9tat sp\xc3\xa9cifi\xc3\xa9\n   switch    Basculer de branche\n   tag       Cr\xc3\xa9er, lister, supprimer ou v\xc3\xa9rifier un objet d'\xc3\xa9tiquette sign\xc3\xa9 avec GPG\n\ncollaborer (voir aussi\xc2\xa0: git help workflows)\n   fetch     T\xc3\xa9l\xc3\xa9charger les objets et r\xc3\xa9f\xc3\xa9rences depuis un autre d\xc3\xa9p\xc3\xb4t\n   pull      Rapatrier et int\xc3\xa9grer un autre d\xc3\xa9p\xc3\xb4t ou une branche locale\n   push      Mettre \xc3\xa0 jour les r\xc3\xa9f\xc3\xa9rences distantes ainsi que les objets associ\xc3\xa9s\n\n'git help -a' et 'git help -g' listent les sous-commandes disponibles et\nquelques concepts. Voir 'git help <commande>' ou 'git help <concept>'\npour en lire plus \xc3\xa0 propos d'une commande sp\xc3\xa9cifique ou d'un concept.\nVoir 'git help git' pour un survol du syst\xc3\xa8me.\n""
+[0m20:47:12.322326 [debug] [MainThread]: STDERR: "b''"
+[0m20:47:12.322590 [info ] [MainThread]:  - git [[32mOK found[0m]
+
+[0m20:47:12.322810 [info ] [MainThread]: Connection test skipped since no profile was found
+[0m20:47:12.323213 [info ] [MainThread]: [31m2 checks failed:[0m
+[0m20:47:12.323444 [info ] [MainThread]: dbt looked for a profiles.yml file in /antoinelarcher/Documents/git_pictet/FIX_trading/dagster/deployments/fix_pipeline/pictet_fix_project/.dbt/profiles.yml, but did
+not find one. For more information on configuring your profile, consult the
+documentation:
+
+https://docs.getdbt.com/docs/configure-your-profile
+
+
+[0m20:47:12.323632 [info ] [MainThread]: Project loading failed for the following reason:
+ project path </Users/antoinelarcher/Documents/git_pictet/FIX_trading/dagster/dbt_project.yml> not found
+
+[0m20:47:12.356513 [debug] [MainThread]: Resource report: {"command_name": "debug", "command_success": false, "command_wall_clock_time": 0.12850967, "process_in_blocks": "0", "process_kernel_time": 0.141998, "process_mem_max_rss": "104169472", "process_out_blocks": "0", "process_user_time": 0.84241}
+[0m20:47:12.356988 [debug] [MainThread]: Command `dbt debug` failed at 20:47:12.356908 after 0.13 seconds
+[0m20:47:12.357312 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x106a06950>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x107d95f00>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x107e3c550>]}
+[0m20:47:12.357586 [debug] [MainThread]: Flushing usage events
+[0m20:47:13.186630 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m20:47:40.336423 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x119e069b0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x11b395f00>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x11b395ab0>]}
+
+
+============================== 20:47:40.339994 | dead7026-5ac3-4451-800f-5f279138887b ==============================
+[0m20:47:40.339994 [info ] [MainThread]: Running with dbt=1.10.2
+[0m20:47:40.340431 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'indirect_selection': 'eager', 'log_cache_events': 'False', 'write_json': 'True', 'partial_parse': 'True', 'cache_selected_only': 'False', 'profiles_dir': '/antoinelarcher/Documents/git_pictet/FIX_trading/dagster/deployments/fix_pipeline/pictet_fix_project/.dbt', 'debug': 'False', 'warn_error': 'None', 'log_path': 'logs', 'version_check': 'True', 'fail_fast': 'False', 'use_colors': 'True', 'use_experimental_parser': 'False', 'no_print': 'None', 'quiet': 'False', 'empty': 'None', 'log_format': 'default', 'static_parser': 'True', 'invocation_command': 'dbt debug', 'introspect': 'True', 'target_path': 'None', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'send_anonymous_usage_stats': 'True'}
+[0m20:47:40.349422 [info ] [MainThread]: dbt version: 1.10.2
+[0m20:47:40.349957 [info ] [MainThread]: python version: 3.10.4
+[0m20:47:40.350181 [info ] [MainThread]: python path: /Users/antoinelarcher/Documents/git_pictet/.venv/bin/python3
+[0m20:47:40.350620 [info ] [MainThread]: os info: macOS-15.5-arm64-arm-64bit
+[0m20:47:40.350941 [info ] [MainThread]: Using profiles dir at /antoinelarcher/Documents/git_pictet/FIX_trading/dagster/deployments/fix_pipeline/pictet_fix_project/.dbt
+[0m20:47:40.351154 [info ] [MainThread]: Using profiles.yml file at /antoinelarcher/Documents/git_pictet/FIX_trading/dagster/deployments/fix_pipeline/pictet_fix_project/.dbt/profiles.yml
+[0m20:47:40.351323 [info ] [MainThread]: Using dbt_project.yml file at /Users/antoinelarcher/Documents/git_pictet/FIX_trading/dagster/dbt_project.yml
+[0m20:47:40.351547 [info ] [MainThread]: Configuration:
+[0m20:47:40.351822 [info ] [MainThread]:   profiles.yml file [[31mERROR not found[0m]
+[0m20:47:40.351983 [info ] [MainThread]:   dbt_project.yml file [[31mERROR not found[0m]
+[0m20:47:40.352133 [info ] [MainThread]: Required dependencies:
+[0m20:47:40.352415 [debug] [MainThread]: Executing "git --help"
+[0m20:47:40.371565 [debug] [MainThread]: STDOUT: "b"usage : git [-v | --version] [-h | --help] [-C <chemin>] [-c <nom>=<valeur>]\n           [--exec-path[=<chemin>]] [--html-path] [--man-path] [--info-path]\n           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--no-lazy-fetch]\n           [--no-optional-locks] [--no-advice] [--bare] [--git-dir=<chemin>]\n           [--work-tree=<chemin>] [--namespace=<nom>] [--config-env=<nom>=<var-d-env>] \n           <commande> [<args>]\n\nCi-dessous les commandes Git habituelles dans diverses situations\xc2\xa0:\n\nd\xc3\xa9marrer une zone de travail (voir aussi\xc2\xa0: git help tutorial)\n   clone     Cloner un d\xc3\xa9p\xc3\xb4t dans un nouveau r\xc3\xa9pertoire\n   init      Cr\xc3\xa9er un d\xc3\xa9p\xc3\xb4t Git vide ou r\xc3\xa9initialiser un existant\n\ntravailler sur la modification actuelle (voir aussi\xc2\xa0: git help revisions)\n   add       Ajouter le contenu de fichiers dans l'index\n   mv        D\xc3\xa9placer ou renommer un fichier, un r\xc3\xa9pertoire, ou un lien symbolique\n   restore   Restaurer les fichiers l'arbre de travail\n   rm        Supprimer des fichiers de la copie de travail et de l'index\n\nexaminer l'historique et l'\xc3\xa9tat (voir aussi\xc2\xa0: git help revisions)\n   bisect    Trouver par recherche binaire la modification qui a introduit un bogue\n   diff      Afficher les changements entre les validations, entre validation et copie de travail, etc\n   grep      Afficher les lignes correspondant \xc3\xa0 un motif\n   log       Afficher l'historique des validations\n   show      Afficher diff\xc3\xa9rents types d'objets\n   status    Afficher l'\xc3\xa9tat de la copie de travail\n\nagrandir, marquer et modifier votre historique\n   branch    Lister, cr\xc3\xa9er ou supprimer des branches\n   commit    Enregistrer les modifications dans le d\xc3\xa9p\xc3\xb4t\n   merge     Fusionner deux ou plusieurs historiques de d\xc3\xa9veloppement ensemble\n   rebase    R\xc3\xa9application des commits sur le sommet de l'autre base\n   reset     R\xc3\xa9initialiser la HEAD courante \xc3\xa0 l'\xc3\xa9tat sp\xc3\xa9cifi\xc3\xa9\n   switch    Basculer de branche\n   tag       Cr\xc3\xa9er, lister, supprimer ou v\xc3\xa9rifier un objet d'\xc3\xa9tiquette sign\xc3\xa9 avec GPG\n\ncollaborer (voir aussi\xc2\xa0: git help workflows)\n   fetch     T\xc3\xa9l\xc3\xa9charger les objets et r\xc3\xa9f\xc3\xa9rences depuis un autre d\xc3\xa9p\xc3\xb4t\n   pull      Rapatrier et int\xc3\xa9grer un autre d\xc3\xa9p\xc3\xb4t ou une branche locale\n   push      Mettre \xc3\xa0 jour les r\xc3\xa9f\xc3\xa9rences distantes ainsi que les objets associ\xc3\xa9s\n\n'git help -a' et 'git help -g' listent les sous-commandes disponibles et\nquelques concepts. Voir 'git help <commande>' ou 'git help <concept>'\npour en lire plus \xc3\xa0 propos d'une commande sp\xc3\xa9cifique ou d'un concept.\nVoir 'git help git' pour un survol du syst\xc3\xa8me.\n""
+[0m20:47:40.372224 [debug] [MainThread]: STDERR: "b''"
+[0m20:47:40.372422 [info ] [MainThread]:  - git [[32mOK found[0m]
+
+[0m20:47:40.372616 [info ] [MainThread]: Connection test skipped since no profile was found
+[0m20:47:40.372841 [info ] [MainThread]: [31m2 checks failed:[0m
+[0m20:47:40.372996 [info ] [MainThread]: dbt looked for a profiles.yml file in /antoinelarcher/Documents/git_pictet/FIX_trading/dagster/deployments/fix_pipeline/pictet_fix_project/.dbt/profiles.yml, but did
+not find one. For more information on configuring your profile, consult the
+documentation:
+
+https://docs.getdbt.com/docs/configure-your-profile
+
+
+[0m20:47:40.373158 [info ] [MainThread]: Project loading failed for the following reason:
+ project path </Users/antoinelarcher/Documents/git_pictet/FIX_trading/dagster/dbt_project.yml> not found
+
+[0m20:47:40.377190 [debug] [MainThread]: Resource report: {"command_name": "debug", "command_success": false, "command_wall_clock_time": 0.09240375, "process_in_blocks": "0", "process_kernel_time": 0.137812, "process_mem_max_rss": "103514112", "process_out_blocks": "0", "process_user_time": 0.856914}
+[0m20:47:40.377666 [debug] [MainThread]: Command `dbt debug` failed at 20:47:40.377572 after 0.09 seconds
+[0m20:47:40.378099 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x119e069b0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x11b395f60>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x11b43c550>]}
+[0m20:47:40.378801 [debug] [MainThread]: Flushing usage events
+[0m20:47:41.072776 [debug] [MainThread]: An error was encountered while trying to flush usage events
