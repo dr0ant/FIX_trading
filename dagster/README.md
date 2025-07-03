@@ -1,80 +1,148 @@
 # FIX Trading Pipeline Project
 
-This project implements a FIX (Financial Information Exchange) trading pipeline using **Dagster** for orchestration, **dbt** for data transformations, **DuckDB** for local and containerized data storage, and **MinIO** for S3-compatible object storage. The pipeline processes FIX log files, converts them to Parquet format, and performs data transformations to generate insights and reports.
+A comprehensive data pipeline for processing and analyzing FIX (Financial Information Exchange) trading data using modern data stack technologies.
 
----
+## Architecture Overview
 
-## Project Overview
+### Microservices
 
-### Key Components
-1. **Dagster**:
-   - Orchestrates the pipeline, including sensors, jobs, and resources.
-   - Monitors new FIX log files in MinIO and triggers processing and dbt transformations.
+| Service | Purpose | Port |
+|---------|---------|------|
+| **MinIO** | S3-compatible object storage for FIX logs | 9000, 9001 |
+| **PostgreSQL** | Metadata storage and pipeline tracking | 5432 |
+| **DuckDB** | Analytical database for dbt transformations | - |
+| **Dagster** | Workflow orchestration and monitoring | 3000 |
+| **Superset** | Data visualization and analytics | 8088 |
 
-2. **dbt**:
-   - Performs SQL-based data transformations on the processed FIX data.
-   - Generates staging, fact, and dimension tables for reporting.
+### Data Flow
 
-3. **DuckDB**:
-   - Lightweight database for local and containerized data storage.
-   - Stores raw and transformed FIX data.
+```mermaid
+graph LR
+    A[FIX Logs .txt] -->|MinIO| B[textfixlogs bucket]
+    B -->|Dagster Sensor| C[Parse & Convert]
+    C -->|MinIO| D[parquetfixlogs bucket]
+    D -->|dbt| E[DuckDB Tables]
+    E -->|dbt models| F[Transformed Data]
+    F -->|Connection| G[Superset Dashboards]
+    
+    subgraph "Storage Layer"
+        B
+        D
+    end
+    
+    subgraph "Processing Layer"
+        C
+        E
+        F
+    end
+    
+    subgraph "Visualization Layer"
+        G
+    end
+```
 
-4. **MinIO**:
-   - S3-compatible object storage for managing FIX log files and Parquet outputs.
+## Pipeline Components
 
-5. **PostgreSQL**:
-   - Tracks processed files and logs metadata for the pipeline.
+### 1. Data Ingestion
+- **Source**: FIX log files (.txt)
+- **Storage**: MinIO S3-compatible storage
+- **Conversion**: Parquet format for efficient querying
 
----
+```mermaid
+graph TD
+    A[FIX Logs] -->|Upload| B[MinIO textfixlogs]
+    B -->|Sensor Detection| C[Dagster Pipeline]
+    C -->|Convert| D[Parquet Files]
+    D -->|Store| E[MinIO parquetfixlogs]
+```
 
-## Pipeline Workflow
+### 2. Data Processing
+- **dbt Models**: SQL-based transformations
+- **Layers**:
+  - Raw Data (00_landing_fix)
+  - Staging (01_staging_fix)
+  - Intermediate (02_intermediate_fix)
+  - KPIs (03_KPI_fix)
 
-1. **FIX Log Ingestion**:
-   - A Dagster sensor monitors the `textfixlogs` bucket in MinIO for new FIX log files.
-   - New files are parsed, converted to Parquet, and uploaded to the `parquetfixlogs` bucket.
+```mermaid
+graph TD
+    A[Raw Parquet] -->|landing_fix| B[Staged Data]
+    B -->|stg_fix_trading| C[Refined Data]
+    C -->|refine_fix_trading| D[KPIs]
+    D -->|Multiple KPI Models| E[Final Tables]
+    
+    subgraph "dbt Models"
+        B
+        C
+        D
+        E
+    end
+```
 
-2. **Data Transformation**:
-   - dbt transforms the Parquet data into staging, fact, and dimension tables.
-   - Aggregated KPIs (e.g., by symbol, system, and day) are generated for reporting.
+## Getting Started
 
-3. **Reporting**:
-   - The transformed data is available for analysis and visualization in tools like Superset.
-
----
-
-## Project Structure
-
-```plaintext
-FIX_trading/
-├── dagster/
-│   ├── dagster.yaml                # Dagster instance configuration
-│   ├── workspace.yaml              # Dagster workspace configuration
-│   ├── docker-compose.yml          # Docker Compose file for the entire stack
-│   ├── [README.md](http://_vscodecontentref_/1)                   # Project documentation
-│   ├── deployments/
-│   │   ├── fix_pipeline/
-│   │   │   ├── fix_sensor.py       # Dagster sensor for FIX log ingestion
-│   │   │   ├── fix_sensor_new.py   # Alternate sensor implementation
-│   │   │   ├── dbt_assets.py       # dbt asset loader for Dagster
-│   │   │   ├── Dockerfile_user_code # Dockerfile for Dagster user code
-│   │   │   ├── pictet_fix_project/ # dbt project directory
-│   │   │   │   ├── dbt_project.yml # dbt project configuration
-│   │   │   │   ├── models/         # dbt models for transformations
-│   │   │   │   ├── .dbt/           # dbt profiles for local and containerized runs
-├── duck_db/                        # Directory for DuckDB files
-│   ├── duckdb_pictet               # DuckDB database file
-├── quickfix/
-│   ├── text_to_parquet.py          # Standalone script for FIX log processing
-
-dbt run --profiles-dir ~/.dbt --target dev -s <model_name>
-
-dagster dev -f dagster/deployments/fix_pipeline/fix_sensor.py
-
+1. **Start the Infrastructure**:
+```bash
 docker-compose up --build
+```
 
-Access Services:
-
+2. **Access Services**:
 - Dagster UI: http://localhost:3000
 - MinIO Console: http://localhost:9001
 - Superset: http://localhost:8088
 
+3. **Default Credentials**:
+```yaml
+MinIO:
+  user: minioadmin
+  password: minioadmin
+
+Superset:
+  user: admin
+  password: admin
+
+PostgreSQL:
+  user: admin
+  password: admin
+  database: fix_db
+```
+
+## Development
+
+### Local Development
+```bash
+# Run dbt models locally
+dbt run --profiles-dir ~/.dbt --target dev
+
+# Start Dagster in development mode
+dagster dev -f dagster/deployments/fix_pipeline/definition.py
+```
+
+### Project Structure
+```
+FIX_trading/
+├── dagster/
+│   ├── deployments/
+│   │   └── fix_pipeline/
+│   │       ├── pictet_fix_project/    # dbt project
+│   │       ├── definition.py          # Dagster pipeline
+│   │       └── fix_sensor.py          # FIX file sensor
+│   └── docker-compose.yml             # Infrastructure setup
+```
+
+## Monitoring & Maintenance
+
+- Monitor pipeline runs in Dagster UI
+- Check processed files in PostgreSQL
+- View data quality metrics in Superset
+- Monitor MinIO storage usage
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
