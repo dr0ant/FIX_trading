@@ -34,6 +34,7 @@ services:
       - ./deployments/fix_pipeline/.duck_db:/opt/duck_db
     command: >
       /bin/bash -c "
+      pip install --upgrade pip &&
       pip install duckdb-engine psycopg2-binary &&
       superset db upgrade &&
       superset fab create-admin --username admin --firstname Superset --lastname Admin --email admin@superset.com --password admin &&
