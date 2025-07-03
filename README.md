@@ -164,7 +164,7 @@ FIX_trading/
 ![Dagster Asset showing the dbt lineage](/Dagster_Assets.png)
 
 ### Dagster Assets
-![Dagster Asset materialization showing history of materialization](/Dagster_Assets.png)
+![Dagster Asset materialization showing history of materialization](/Dagster_Asset_materializqtion_history.png)
 
 ### Minio Storage txt files 
 ![Minio shows deposited by the servers raw txt files](/Minio_txt.png)
