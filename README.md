@@ -64,7 +64,7 @@ graph TD
 ### 2. Data Processing
 - **dbt Models**: SQL-based transformations
 
--**dbt docs**: https://dr0ant.github.io/FIX_trading/
+- **dbt docs**: https://dr0ant.github.io/FIX_trading/
 - **Layers**:
   - Raw Data (00_landing_fix)
   - Staging (01_staging_fix)
