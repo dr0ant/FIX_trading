@@ -158,7 +158,7 @@ FIX_trading/
 ![Superset Dashboard showing FIX trading metrics with KPIs and charts](superset.png)
 
 ### Dagster Sensor
-![Dagster sensor monitoring interface showing successful runs](/dagster_sensor.png)
+![Dagster sensor monitoring interface showing successful runs](/Dagster_sensor.png)
 
 ### Dagster Assets
 ![Dagster Asset showing the dbt lineage](/Dagster_Assets.png)
