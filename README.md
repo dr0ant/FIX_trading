@@ -154,8 +154,11 @@ FIX_trading/
 
 ## Fancy screenshots
 
-### Superset Dashboard
+### Superset Dashboard 1
 ![Superset Dashboard showing FIX trading metrics with KPIs and charts](superset.png)
+
+### Superset Dashboard 2
+![Superset Dashboard showing FIX trading metrics with KPIs and charts](execution_report_Superset.png)
 
 ### Dagster Sensor
 ![Dagster sensor monitoring interface showing successful runs](/Dagster_sensor.png)
