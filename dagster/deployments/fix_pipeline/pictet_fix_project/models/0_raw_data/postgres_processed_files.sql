@@ -6,4 +6,4 @@
 }}
 
 SELECT *
-FROM postgres_scan_pushdown('host=localhost port=5432 user=admin password=admin dbname=fix_db', 'public', 'processed_files')
+FROM postgres_scan_pushdown('host=postgres port=5432 user=admin password=admin dbname=fix_db', 'public', 'processed_files')

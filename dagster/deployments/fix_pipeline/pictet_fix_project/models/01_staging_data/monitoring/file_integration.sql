@@ -1,6 +1,6 @@
 -- intermediate/fix__int_order_metrics.sql
 {{ 
-    config(materialized='view',
+    config(materialized='table',
     schema='000_monitoring')
  }}
 
