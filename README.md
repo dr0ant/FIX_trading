@@ -182,4 +182,4 @@ We are in 2025, of course I use my LLMs friends to fasten the process thanks to 
 - https://chatgpt.com/ : Ok but often need to be super guided and often miss context
 - https://claude.ai/new : My debugger Man , one of my favorit
 - https://chat.deepseek.com/ : Fast but low smart still give different answers so interesting
-- https://gemini.google.com/app?hl=fr : please stop propising using google services every 2 prompts ...
+- https://gemini.google.com/app?hl=fr : very interesting with the latest version
